@@ -17,5 +17,5 @@ proven open implementation of constraint-based layout, and its licence allows re
 ## Consequences
 The target API needs Prismio features that do not exist (stored closures, trailing closures,
 named arguments, a composable transform). Until they do, the framework ships the v0 API in
-0008, which keeps the component names and the layout model and changes only how context, events
+0008, which keeps the composable names and the layout model and changes only how context, events
 and state are spelled.

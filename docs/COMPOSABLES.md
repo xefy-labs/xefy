@@ -1,17 +1,17 @@
-# Components
+# Composables
 
 > Status: names, tiers and the look are decided (0016, 0018). Nothing here is built.
 
-Names follow Jetpack Compose where Compose has the component, so documentation and habits
-carry over. Signatures are in the v0 form (`docs/FRAMEWORK_V0.md`): `ui` first, then required
-arguments, then an optional class string (`docs/STYLE_CLASSES.md`) or `Modifier`, then content.
+Names follow Jetpack Compose where Compose has the composable, so documentation and habits
+carry over. Signatures are in the v0 form (`docs/FRAMEWORK_V0.md`): `scope` first, then required
+arguments, then an optional class string (`docs/TINT.md`) or `Modifier`, then content.
 
 Tiers: **0** is what the framework itself is tested with, **1** is what an ordinary app needs,
 **2** is desktop and OS work that comes after v0.
 
 ## Layout
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `Column`, `Row` | 0 | Flex layout; `spacing`, `weight`, main and cross alignment through `Modifier` |
 | `Box` | 0 | Stacks children; `align` per child |
@@ -26,7 +26,7 @@ Tiers: **0** is what the framework itself is tested with, **1** is what an ordin
 
 ## Text and input
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `Text` | 0 | Style from the theme's type scale; max lines and ellipsis |
 | `TextField` | 1 | Single line: caret, selection, clipboard, undo |
@@ -37,7 +37,7 @@ Tiers: **0** is what the framework itself is tested with, **1** is what an ordin
 
 ## Actions
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `Button` | 0 | Returns true when activated. Variants: filled, tonal, outlined, text |
 | `IconButton` | 1 | |
@@ -47,7 +47,7 @@ Tiers: **0** is what the framework itself is tested with, **1** is what an ordin
 
 ## Selection
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `Checkbox` | 0 | Takes a `Bool` state handle |
 | `Switch` | 1 | |
@@ -59,7 +59,7 @@ Tiers: **0** is what the framework itself is tested with, **1** is what an ordin
 
 ## Containers and navigation
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `Card` | 1 | `Surface` with standard padding and shape |
 | `Tabs` | 1 | |
@@ -76,7 +76,7 @@ Tiers: **0** is what the framework itself is tested with, **1** is what an ordin
 
 ## Feedback
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `ProgressBar` | 1 | Determinate and indeterminate |
 | `Spinner` | 1 | |
@@ -86,7 +86,7 @@ Tiers: **0** is what the framework itself is tested with, **1** is what an ordin
 
 ## Media and drawing
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `Image` | 0 | From an asset path or bytes; fit modes |
 | `Icon` | 1 | From an icon font or vector asset; tinted |
@@ -96,23 +96,23 @@ Tiers: **0** is what the framework itself is tested with, **1** is what an ordin
 
 ## Data
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `List`, `ListItem` | 1 | Rows with leading, title, subtitle, trailing; selection |
 | `Table` | 2 | Columns, sorting, resizable headers |
 | `Tree` | 2 | Expandable hierarchy |
 
-## Desktop and XefyOS
+## Desktop and AOS
 
-| Component | Tier | Notes |
+| Composable | Tier | Notes |
 |---|---|---|
 | `MenuBar` | 2 | Application menu; maps to the native menu on macOS |
 | `TitleBar` | 2 | Custom window chrome with drag region and window controls |
 | `Toolbar` | 2 | |
 | `StatusBar` | 2 | |
-| Shell pieces: dock, launcher, notification centre, system tray | 2 | Part of `os/`, built from the components above |
+| Shell pieces: dock, launcher, notification centre, system tray | 2 | Part of `os/`, built from the composables above |
 
 ## Theme
 
 Porcelain (decision 0018). Every token value is in `docs/THEME.md`. Apps change the look by
-replacing tokens, not by restyling components.
+replacing tokens, not by restyling composables.

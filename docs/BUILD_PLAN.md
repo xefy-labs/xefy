@@ -51,7 +51,7 @@ and run; the header still compiles as C99 and C++17 with `-Wall -Wextra -Wpedant
 | B2 | **`xefy.color`** and tests | `framework/xefy/color.psm`, test | none | H |
 | B3 | **`xefy.animation`**: extend the cubic curve port already in `framework/xefy/animation.psm`: add the rest of Flutter's named curves, linear tweens for `F32` and colour, and Flutter's spring simulation (`physics/spring_simulation.dart`) | `framework/xefy/animation.psm`, test | B2 | S |
 | B4 | **`xefy.modifier`** | `framework/xefy/modifier.psm`, test | B1, B2 | H |
-| B8 | **`xefy.style`**: the class-string parser, the cache, variant resolution against a state record, and every utility in `docs/STYLE_CLASSES.md`. Tests for each utility, each variant, override order and every error case | `framework/xefy/style.psm`, `framework/tests/style_*` | B4, C5 | S |
+| B8 | **`xefy.tint`**: the class-string parser, the cache, variant resolution against a state record, and every utility in `docs/TINT.md`. Tests for each utility, each variant, override order and every error case | `framework/xefy/tint.psm`, `framework/tests/tint_*` | B4, C5 | S |
 | B5 | **`xefy.tree`**: arena, node kinds and data, ids, child linking, a debug dump | `framework/xefy/tree.psm`, test | B4 | S |
 | B6 | **`xefy.layout`**: modifiers, flex (port `RenderFlex`), box (port `RenderStack`), spacer, image, scroll, text through a replaceable measurer. Port Flutter's flex tests | `framework/xefy/layout.psm`, `framework/tests/layout_*` | B5 | S, design review O |
 | B7 | **Framework test runner.** `python3 xefy.py test` builds and runs every `framework/tests/*_test.psm` and reports failures | `tools/xefy_tools/testing.py`, `framework/build.ums` | none | S |
@@ -63,30 +63,41 @@ Done when: `python3 xefy.py test` passes and every file passes `prismio fmt --ch
 | # | Package | Owns | Depends on | Model |
 |---|---|---|---|---|
 | C1 | **`xefy.gfx` and `xefy.platform`**: wrappers over `xefy.ffi`. Example: a Prismio program that opens a window and draws shapes and a paragraph | `framework/xefy/gfx.psm`, `platform.psm`, `examples/hello_canvas/*` | A1, A3, A4, A5 | S |
-| C2 | **`xefy.ui`**: `Ui`, state pools and slot keys, the input snapshot, retained per-id data. Tests with scripted input | `framework/xefy/ui.psm`, test | B5 | S, design review O |
+| C2 | **`xefy.runtime`**: `Scope`, state pools and slot keys, the input snapshot, retained per-id data. Tests with scripted input | `framework/xefy/runtime.psm`, test | B5 | S, design review O |
 | C3 | **`xefy.hit`**: hover, press, activation, focus, keyboard activation, scroll targeting. Tests | `framework/xefy/hit.psm`, test | C2 | S |
 | C4 | **`xefy.paint`** and paragraph caching | `framework/xefy/paint.psm` | B5, C1 | S |
 | C5 | **`xefy.theme`**: the light and dark token sets from `docs/THEME.md`, with a test that recomputes the contrast table | `framework/xefy/theme.psm`, test | B2 | H |
+| C9 | **Theme presets.** Token files for Graphite and Signal with the same roles as Porcelain and a contrast table each; the generator that turns preset plus an app's `theme.xf` into a Prismio module; `xefy create --theme` | `framework/themes/*.xf`, `cli/src/theme*.psm`, tests | C5, D4 | S, values reviewed O |
 | C8 | **Shipped assets.** Pin Geist, Geist Mono and Phosphor (regular) in `deps.lock.json` by version and checksum, fetch them in `setup` into `framework/assets/`, add their licence texts, and an icon-name table for `Icon` | `tools/xefy_tools/assets.py`, `deps.lock.json`, `framework/assets/*`, `licenses/*` | none | S |
-| C6 | **`xefy.components`, tier 0** (see `docs/COMPONENTS.md`) and `remember*`, `key` | `framework/xefy/components.psm`, tests | C2, C3, C5 | S |
+| C6 | **`xefy.ui`, tier 0** (see `docs/COMPOSABLES.md`) and `remember*`, `key` | `framework/xefy/ui.psm`, tests | C2, C3, C5 | S |
 | C7 | **`xefy.app`**: `runApp` and the frame loop. Example: the counter from `docs/FRAMEWORK_V0.md` | `framework/xefy/app.psm`, `examples/counter/*` | C1 to C6, B6 | S |
 
 Done when: `examples/counter` builds, opens a window, and the count rises on click and on
-Space with the button focused; component tests pass headless.
+Space with the button focused; composable tests pass headless.
 
-## Phase D: components and tools
+## Phase D: composables and tools
 
 | # | Package | Owns | Depends on | Model |
 |---|---|---|---|---|
 | D1 | **Text field.** Single-line and multi-line editing: caret, selection by keyboard and pointer, word movement, clipboard, undo. Behaviour ported from Flutter's editable text | `framework/xefy/text_field.psm`, tests | C7, A4 | O |
 | D2 | **Scrolling.** Scroll node behaviour, wheel and drag, scrollbar, Flutter's clamping and bouncing physics | `framework/xefy/scroll.psm`, tests | C7, B3 | S |
-| D3 | **Components, tier 1**, one package per group in `docs/COMPONENTS.md` | `framework/xefy/components_<group>.psm` | C7 | S each |
+| D3 | **Composables, tier 1**, one package per group in `docs/COMPOSABLES.md` | `framework/xefy/ui_<group>.psm` | C7 | S each |
 | D4 | **`config.xf` parser** in the CLI, with every error case in `docs/config-xf.md` tested | `cli/src/config*.psm`, `cli/tests/*` | none | S |
 | D5 | **`xefy build` and `xefy run`**: generate `.xefy/build.ums` from `config.xf` and `build/<target>/link.json`, link the framework symlink (0013), call `prismio build` | `cli/src/build*.psm` | D4, A2 | S |
 | D6 | **`xefy bundle` for macOS**: `.app` with `Info.plist`, icon and assets | `cli/src/bundle*.psm` | D5 | S |
 | D9 | **`xefy check`**: scan class-string literals in an app's sources and report unknown or misapplied classes with file and line | `cli/src/check*.psm` | B8 | S |
-| D7 | **Gallery example** showing every component, used for manual checks and screenshots | `examples/gallery/*` | D3 | S |
-| D8 | **Golden image tests**: render component states offscreen and compare with stored PNGs | `tools/xefy_tools/golden.py`, `framework/tests/golden/*` | A3, C7 | S |
+| D7 | **Gallery example** showing every composable, used for manual checks and screenshots | `examples/gallery/*` | D3 | S |
+| D8 | **Golden image tests**: render composable states offscreen and compare with stored PNGs | `tools/xefy_tools/golden.py`, `framework/tests/golden/*` | A3, C7 | S |
+
+## Phase E: app APIs and IDE
+
+| # | Package | Owns | Depends on | Model |
+|---|---|---|---|---|
+| E1 | **`xefy.nav`** per `docs/APP_APIS.md`, with tests | `framework/xefy/nav.psm`, test | C2 | H |
+| E2 | **`xefy.assets` and `xefy.i18n`**, plus the two ABI additions they need (resource path, locale) | `framework/xefy/assets.psm`, `i18n.psm`, tests, the two functions in `engine/abi/xefy_engine.h` | C1, D4 | S |
+| E3 | **Shortcuts and the overlay layer**: `shortcut`, the second root, `Dialog`, `Popover`, `Menu`, `Tooltip` | `framework/xefy/overlay.psm`, `shortcut.psm`, tests | C7 | S |
+| E4 | **`xefy ide` commands and `xefy check --format json`**, exactly as specified in `docs/IDE_PLUGIN.md`, with a recorded sample of each output under `cli/tests/ide/` | `cli/src/ide*.psm`, `cli/tests/ide/*` | D4, D9, B8 | S |
+| E5 | **JetBrains plugin, phase 1**, in its own repository beside the SDK, against the recorded JSON from E4 | the `jetbrains-plugin` repository | E4 | S, review O |
 
 ## Order
 
@@ -104,5 +115,5 @@ to need a second pass.
 
 ## Not planned here
 
-Windows, X11 and DRM embedders, `xefy.three`, XefyOS, accessibility, and the move to the
+Windows, X11 and DRM embedders, `xefy.three`, AOS, accessibility, and the move to the
 target Compose API. Each gets its own plan once v0 runs.

@@ -1,8 +1,9 @@
 # Xefy architecture
 
-Xefy is a cross-platform UI framework written in Prismio. Apps describe UI in a Jetpack
-Compose-style API; Xefy lays it out, paints it with Skia, and runs it on macOS, Windows, Linux
-and XefyOS (a desktop OS on the Linux kernel). It reuses Flutter's source where that saves
+Xefy is a cross-platform UI framework written in Prismio. Apps describe UI with **Xefy UI**,
+a declarative API of composables in the style of Jetpack Compose, styled with **Tint**
+classes. Xefy lays it out, paints it with Skia, and runs it on macOS, Windows, Linux and
+AOS (a desktop OS on the Linux kernel). It reuses Flutter's source where that saves
 work and depends on neither Flutter nor Dart.
 
 ## Where things are written down
@@ -12,19 +13,22 @@ work and depends on neither Flutter nor Dart.
 | `docs/adr/` | One record per decision, with its reason and consequences |
 | `docs/FRAMEWORK_V0.md` | The framework as it is built now: modules, types, the frame loop |
 | `docs/BUILD_PLAN.md` | Work packages: who owns which paths, what each depends on, how each is checked |
-| `docs/COMPONENTS.md` | The component catalogue |
+| `docs/COMPOSABLES.md` | The composable catalogue |
 | `docs/THEME.md` | Porcelain: every colour, size, radius, shadow and duration |
-| `docs/STYLE_CLASSES.md` | The utility class vocabulary |
+| `docs/TINT.md` | The utility class vocabulary |
+| `docs/APP_APIS.md` | App state, navigation, assets, strings, shortcuts, overlays |
+| `docs/IDE_PLUGIN.md` | The JetBrains plugin and the JSON contract the `xefy` tool gives it |
 | `docs/config-xf.md` | The app configuration format |
 | `engine/abi/xefy_engine.h` | The native boundary |
 
 ## Layers
 
 ```
-App code (Prismio, Compose-style)
+App code (Prismio, written with Xefy UI)
 ────────────────────────────────────────────────────────────────
-xefy.kit        components and the design system
-xefy.compose    composer, slot table, remember, snapshot state, modifiers
+xefy.ui         the built-in composables
+xefy.tint       utility classes over the theme's tokens
+xefy.runtime    Scope, remember, state, recomposition, modifiers
 xefy.render     render tree: constraints, layout, paint, hit-test
 xefy.gestures   xefy.animation   xefy.scheduler   xefy.semantics   xefy.text
 xefy.gfx        Canvas, Paint, Path, Paragraph, Image (Prismio API over the C ABI)
@@ -34,7 +38,7 @@ skia_c          C++ shim that implements the drawing and text half of the ABI on
 embedder        window, vsync, input, IME, clipboard, accessibility; one per platform
 three           optional: bgfx renders a scene into a texture the canvas can draw
 ────────────────────────────────────────────────────────────────
-macOS · Windows · Linux (Wayland, X11) · Linux DRM/KMS (XefyOS)
+macOS · Windows · Linux (Wayland, X11) · Linux DRM/KMS (AOS)
 ```
 
 Rules that hold everywhere:
@@ -57,14 +61,14 @@ One frame:
 
 1. The app's loop polls the engine for input and a vsync tick. Prismio owns the loop; the
    engine never calls back into it (decision 0004).
-2. The root component function runs and builds this frame's node tree.
+2. The root composable function runs and builds this frame's node tree.
 3. Layout sizes and positions the nodes, then paint draws them through Skia into the window
    surface, which is presented.
 
-That is the v0 runtime, which is what Prismio 0.2.0 can express: an explicit `ui` context,
+That is the v0 runtime, which is what Prismio 0.2.0 can express: an explicit `scope` context,
 immediate-mode events and a tree rebuilt each frame (decision 0008, `FRAMEWORK_V0.md`). The
 target runtime re-runs only the composables whose state changed and keeps a retained tree. It
-replaces v0 behind the same component names once Prismio has the features listed in
+replaces v0 behind the same composable names once Prismio has the features listed in
 `XEFY_PLAN.md`. Everything runs on one thread until Prismio has synchronisation types.
 
 ## Graphics
@@ -83,7 +87,7 @@ before `xefy.three` is built on it.
 | Flutter source | What Xefy does |
 |---|---|
 | `packages/flutter/lib/src/{rendering,gestures,animation,scheduler,physics,painting,semantics}` and `services` text input (Dart) | Port to Prismio |
-| `widgets/`, `material/`, `cupertino/` (Dart) | Not ported; `xefy.compose` and `xefy.kit` replace them |
+| `widgets/`, `material/`, `cupertino/` (Dart) | Not ported; `xefy.runtime` and `xefy.ui` replace them |
 | Engine `flow/` (layer tree, raster cache) and `display_list/` (C++) | Copy into `vendor/flutter/`, or port |
 | Engine `shell/platform/*` keyboard, IME and accessibility code (C++, Objective-C) | Copy selectively into the embedders |
 | `lib/ui`, `runtime/`, `tonic`, Impeller, Dart VM glue | Not used |
@@ -115,7 +119,7 @@ engine/
 framework/         the Prismio packages listed under Layers
 cli/               the `xefy` tool app developers use, written in Prismio
 templates/app/     what `xefy create` copies
-os/                XefyOS: compositor, shell, .xapp packaging
+os/                AOS: compositor, shell, .xapp packaging
 examples/  tests/  docs/  licenses/
 ```
 
@@ -144,7 +148,7 @@ An app is a directory with a `config.xf` (see [config-xf.md](config-xf.md)) and 
 notes/
   config.xf        the one file a developer edits for app settings
   xefy.lock        resolved dependency versions
-  src/             main.psm, app.psm, ui/, state/
+  src/             main.psm, app.psm, scope/, state/
   assets/          images/, fonts/, shaders/
   i18n/            en.xf, ...
   native/          optional C or C++ the app brings itself
@@ -156,7 +160,7 @@ notes/
 `config.xf` is the source of truth. The `xefy` tool generates `.xefy/build.ums` from it and
 runs `prismio build`, so an app never states link flags or platform frameworks itself.
 
-## XefyOS
+## AOS
 
 - Apps are ordinary Linux ELF executables. Nothing about an app is freestanding.
 - The `linux_drm` embedder drives the display through DRM/KMS and reads input through
@@ -175,9 +179,9 @@ runs `prismio build`, so an app never states link flags or platform frameworks i
 | M1 | C ABI, Skia shim, macOS embedder, `xefy.gfx` drawing a frame from Prismio |
 | M2 | Render tree: box and flex layout, paint, hit-test, text |
 | M3 | Compose runtime and the first public API |
-| M4 | Gestures, animation, text input, first `xefy.kit` components |
+| M4 | Gestures, animation, text input, first `xefy.ui` composables |
 | M5 | Linux Wayland and DRM embedders; `xefy build` and `xefy bundle` |
-| M6 | XefyOS compositor and shell; `xefy.three` |
+| M6 | AOS compositor and shell; `xefy.three` |
 
 M2 and M3 depend on Prismio features that do not exist yet. They are listed with evidence, an
 order of work and the workarounds Xefy uses meanwhile in `docs/XEFY_PLAN.md` of the Prismio

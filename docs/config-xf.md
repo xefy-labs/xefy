@@ -71,6 +71,16 @@ Paths are relative to the app root and are the keys the app loads assets by.
 
 Resolved versions are written to `xefy.lock`.
 
+### `theme`
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `preset` | `"porcelain"` | A theme shipped with Xefy |
+| `mode` | `"system"` | `"light"`, `"dark"`, or follow the system |
+| `file` | none | A `.xf` file of the app's own token overrides, or a whole theme |
+
+Token names are those in `docs/THEME.md`. A theme that fails its contrast checks is an error.
+
 ### `features`
 
 Optional parts of the framework. A feature that is off is not linked.
@@ -81,7 +91,7 @@ Optional parts of the framework. A feature that is off is not linked.
 
 ### `permissions`
 
-What the app may do. XefyOS enforces these from the installed manifest; other platforms map
+What the app may do. AOS enforces these from the installed manifest; other platforms map
 them to their own mechanism where one exists (macOS entitlements) and otherwise ignore them.
 
 | Setting | Values |
@@ -99,7 +109,7 @@ One block per platform the app builds for. A platform with no block uses default
 | `macos` | `minOs`, `category`, `signing { identity = "..." }` |
 | `windows` | `minOs`, `icon` |
 | `linux` | `backend` = `"wayland"` or `"x11"` |
-| `xefyos` | `format` = `"xapp"` |
+| `aos` | `format` = `"xapp"` |
 
 ### `native`
 
@@ -143,7 +153,7 @@ permissions {
 targets {
     macos  { minOs = "13.0" }
     linux  { backend = "wayland" }
-    xefyos { format = "xapp" }
+    aos { format = "xapp" }
 }
 ```
 

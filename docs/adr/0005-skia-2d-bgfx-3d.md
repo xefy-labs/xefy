@@ -10,7 +10,7 @@ device. Both cannot own one window surface.
 - Skia draws all UI and owns the window surface and presentation: Metal on macOS, Vulkan or GL
   on Linux, Direct3D or Vulkan on Windows.
 - bgfx renders 3D scenes into an offscreen texture. The UI draws that texture through a
-  `Scene3D` component like an image.
+  `Scene3D` composable like an image.
 - bgfx is optional: the `three` feature in `config.xf`, the `xefy.three` package, and
   `python3 xefy.py setup --with three`. An app without it links no bgfx.
 

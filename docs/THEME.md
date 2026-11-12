@@ -1,7 +1,9 @@
 # Theme: Porcelain
 
-The token values behind every component (decisions 0016 and 0018). `xefy.theme` is generated
-from, or checked against, this file. Components and class strings refer to tokens by the names
+Porcelain is the default theme and the reference for every other preset (decision 0022): a
+preset supplies a value for each token below. These are the token values behind every
+composable (decisions 0016 and 0018). `xefy.theme` is generated
+from, or checked against, this file. Composables and class strings refer to tokens by the names
 here; nothing else may hard-code a colour, size or duration.
 
 Colours are `0xAARRGGBB` in code and written as `#RRGGBB` here. Sizes are logical pixels.
@@ -101,9 +103,9 @@ raised surfaces use the lighter `surface-raised` fill and a `border` hairline as
 
 A setting to reduce motion replaces every transition with a 1-frame change.
 
-## Component states
+## Composable states
 
-How a control uses the roles, so every component is consistent:
+How a control uses the roles, so every composable is consistent:
 
 | State | Neutral control | Primary control |
 |---|---|---|

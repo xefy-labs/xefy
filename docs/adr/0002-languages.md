@@ -8,7 +8,7 @@ windowing APIs are Objective-C, C++ or C.
 
 ## Decision
 - Everything above `engine/abi/xefy_engine.h` is Prismio: layout, painting logic, input
-  handling, text editing, state, components, the CLI.
+  handling, text editing, state, composables, the CLI.
 - C++ and Objective-C++ are allowed only under `engine/` and `vendor/`, and only to reach an
   API that cannot be reached from C.
 - Repository scripts are Python 3.9, standard library only. No shell scripts, no Makefiles.

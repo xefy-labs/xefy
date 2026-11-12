@@ -1,4 +1,4 @@
-# 0015. XefyOS app model
+# 0015. AOS app model
 
 Status: accepted (2026-11-12). Details open until the Linux embedders exist.
 

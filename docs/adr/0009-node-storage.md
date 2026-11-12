@@ -20,6 +20,6 @@ trait objects, no shared ownership and no weak references.
 
 ## Consequences
 No ownership cycles and nothing to free by hand: the arena is cleared at the start of a frame.
-Third-party node kinds are not possible in v0; a custom-drawn component uses the `Canvas` node.
+Third-party node kinds are not possible in v0; a custom-drawn composable uses the `Canvas` node.
 Adding a node kind means touching the kind tag and each `match`, so each pass keeps its
 `match` in one function.

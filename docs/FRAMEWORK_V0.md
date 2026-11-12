@@ -13,37 +13,40 @@ so in your report. The Prismio repository's `docs/XEFY_PLAN.md` lists what is kn
 
 ```prismio
 import xefy.app
+import xefy.runtime
 import xefy.ui
-import xefy.components
 import xefy.modifier
 
-fn Counter(ui: Ui) {
-    let count = rememberInt(ui, 0)
-    Column(ui, "p-6 gap-3", |ui: Ui| {
-        Text(ui, "Clicked " + getInt(ui, count).toString() + " times")
-        if Button(ui, "Add", "hover:bg-primary-hover transition") {
-            setInt(ui, count, getInt(ui, count) + 1)
+fn Counter(scope: Scope) {
+    let count = rememberInt(scope, 0)
+    Column(scope, "p-6 gap-3", |scope: Scope| {
+        Text(scope, "Clicked " + getInt(scope, count).toString() + " times")
+        if Button(scope, "Add", "hover:bg-primary-hover transition") {
+            setInt(scope, count, getInt(scope, count) + 1)
         }
     })
 }
 
 fn main() -> Int {
-    return runApp(appConfig("Counter", 480, 320), |ui: Ui| { Counter(ui) })
+    return runApp(appConfig("Counter", 480, 320), |scope: Scope| { Counter(scope) })
 }
 ```
 
-Rules every component follows:
+Rules every composable follows:
 
-- `ui: Ui` is the first parameter. A container's content closure takes `ui: Ui` as its only
-  parameter and the container passes its own `ui` in. `ui` is never captured.
-- A component that can be activated returns `Bool`: true on the frame after the activation.
+- `scope: Scope` is the first parameter. A container's content closure takes `scope: Scope` as its only
+  parameter and the container passes its own `scope` in. `scope` is never captured.
+- A composable that can be activated returns `Bool`: true on the frame after the activation.
+- A container also has a four-parameter form, `(scope, state, classes, content)`, that passes the
+  app's own state into a content closure of the form `|scope: Scope, state: T|` (decision 0019,
+  `docs/APP_APIS.md`).
 - Optional settings come through overloads by parameter count. The order is always
-  `(ui, required..., style, content)`, where `style` is a class string or a `Modifier`
-  (decision 0017). Each component has both overloads and one without `style`.
-- Public component names are capitalised (`Column`, `Text`); everything else is camelCase.
-- A component never keeps a `String`, a `Vec` or a struct in a local that a later content
+  `(scope, required..., style, content)`, where `style` is a class string or a `Modifier`
+  (decision 0017). Each composable has both overloads and one without `style`.
+- Public composable names are capitalised (`Column`, `Text`); everything else is camelCase.
+- A composable never keeps a `String`, a `Vec` or a struct in a local that a later content
   closure also needs: the closure would move it. Pass such values as arguments, or keep them
-  in `Ui` state and capture the `Int` handle.
+  in `Scope` state and capture the `Int` handle.
 
 ## Modules
 
@@ -60,13 +63,13 @@ exactly what it uses. A module may import only modules above it in this table.
 | `xefy.animation` | Curves (the cubic solver is already ported), tweens, spring simulation | none |
 | `xefy.modifier` | `Modifier` and its operations | geometry, color |
 | `xefy.theme` | `Theme`: colours, type scale, spacing, shape radii | color |
-| `xefy.style` | Class strings: parse, cache, and resolve to `ModifierOp`s for a node's state (`docs/STYLE_CLASSES.md`) | modifier, theme, color |
+| `xefy.tint` | Class strings: parse, cache, and resolve to `ModifierOp`s for a node's state (`docs/TINT.md`) | modifier, theme, color |
 | `xefy.tree` | The node arena, node kinds, per-kind data, stable ids | geometry, color, modifier |
-| `xefy.ui` | `Ui`: tree, state pools, input snapshot, interaction state, theme, frame clock | tree, geometry, theme, platform, gfx |
+| `xefy.runtime` | `Scope`: tree, state pools, input snapshot, interaction state, theme, frame clock | tree, geometry, theme, platform, gfx |
 | `xefy.layout` | The layout pass | tree, geometry, gfx |
 | `xefy.paint` | The paint pass | tree, geometry, gfx, color |
-| `xefy.hit` | Hit-testing and the interaction rules (hover, press, focus, scroll target) | tree, geometry, ui |
-| `xefy.components` | Every public component, `remember*`, `key` | ui, tree, modifier, theme, geometry |
+| `xefy.hit` | Hit-testing and the interaction rules (hover, press, focus, scroll target) | tree, geometry, runtime |
+| `xefy.ui` | Every public composable, `remember*`, `key` | runtime, tree, modifier, theme, geometry |
 | `xefy.app` | `appConfig`, `runApp`: the event loop | everything |
 
 ## Geometry (`xefy.geometry`)
@@ -115,10 +118,10 @@ public struct Tree {
 
 Node kinds in v0: `NODE_BOX` (stacks children, like Compose's `Box`), `NODE_FLEX` (row or
 column), `NODE_TEXT`, `NODE_IMAGE`, `NODE_SPACER`, `NODE_SCROLL`, `NODE_CANVAS`. Every other
-component is built from these plus modifiers.
+composable is built from these plus modifiers.
 
 **Ids.** `id = hash64(parent.id, kind, ordinal)`, where `ordinal` is the node's position among
-its siblings, or the explicit key from `key(ui, k)`. The hash is FNV-1a over those three
+its siblings, or the explicit key from `key(scope, k)`. The hash is FNV-1a over those three
 values. The root's id is a constant. Two siblings with the same id is a bug: report it once per
 frame in debug builds.
 
@@ -153,15 +156,15 @@ Order matters and follows Compose: operations apply outside-in in the order writ
 ops in order, wrapping constraints; paint walks them in the same order, drawing and
 translating.
 
-## `Ui` (`xefy.ui`)
+## `Scope` (`xefy.runtime`)
 
-`Ui` is the one mutable value. It holds:
+`Scope` is the one mutable value. It holds:
 
 - **`tree`**: this frame's `Tree`, and `current`: the arena index children attach to.
 - **State pools**: `ints: Vec<Int>`, `floats: Vec<F32>`, `bools: Vec<Bool>`,
   `strings: Vec<String>`, and a map from slot key to pool index. A slot key is
   `hash64(ownerId, slotOrdinal)` where `slotOrdinal` counts `remember*` calls made while that
-  owner is current. `rememberInt(ui, init)` returns the existing handle or creates one.
+  owner is current. `rememberInt(scope, init)` returns the existing handle or creates one.
   Slots whose owner did not appear for a frame are released at the end of that frame.
 - **Retained per-id data**: last frame's rectangle in window coordinates, scroll offsets,
   running animations, cached paragraphs. Maps from id.
@@ -180,13 +183,13 @@ translating.
    input snapshot. Pointer, key, text, resize and scale events set `needsFrame`.
 2. When `needsFrame` is set and no frame is pending, `requestFrame`.
 3. On a `FRAME` event:
-   1. `uiBeginFrame`: reset the tree, resolve interaction from the snapshot and **last frame's**
+   1. `scopeBegin`: reset the tree, resolve interaction from the snapshot and **last frame's**
       rectangles (`xefy.hit`).
-   2. Call `root(ui)`. Components append nodes and read interaction state.
+   2. Call `root(scope)`. Composables append nodes and read interaction state.
    3. `layout(tree, root, tight(windowSize))`.
    4. Record every node's window rectangle by id for the next frame.
    5. `beginFrame`, `paint(tree, canvas)`, `endFrame`.
-   6. `uiEndFrame`: clear input edges, release dead slots. If anything is animating or a setter
+   6. `scopeEnd`: clear input edges, release dead slots. If anything is animating or a setter
       ran, leave `needsFrame` set.
 4. On `QUIT_REQUESTED` or the last window closing, leave the loop and return 0.
 
@@ -235,9 +238,9 @@ Resolved once per frame, before composition, against last frame's rectangles:
 - **Scroll**: wheel deltas go to the innermost `NODE_SCROLL` under the pointer that can still
   scroll in that direction.
 
-A component asks by its own id: `uiIsHovered(ui, id)`, `uiIsPressed`, `uiWasActivated`,
-`uiHasFocus`. Because a component knows its id as soon as it creates its node, `Button` is: make
-the node, read `uiWasActivated`, pick colours from hovered and pressed, add the label, return
+A composable asks by its own id: `isHovered(scope, id)`, `isPressed`, `wasActivated`,
+`hasFocus`. Because a composable knows its id as soon as it creates its node, `Button` is: make
+the node, read `wasActivated`, pick colours from hovered and pressed, add the label, return
 the flag.
 
 ## Testing
@@ -246,7 +249,7 @@ the flag.
   `prismio test` and no engine. Layout tests build a tree by hand, run layout with the fixed
   measurer and assert rectangles. Port Flutter's cases from `packages/flutter/test/rendering/`
   where a port exists.
-- Component tests run a root function against a `Ui` with a scripted input snapshot and
+- Composable tests run a root function against a `Scope` with a scripted input snapshot and
   assert on the tree and on state, for two or three frames. No window.
 - Drawing is tested by rendering to an offscreen raster surface and comparing against a
   stored PNG, once the engine has an offscreen surface.

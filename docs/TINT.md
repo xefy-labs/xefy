@@ -1,15 +1,16 @@
-# Style classes
+# Tint
 
-The vocabulary of class strings (decision 0017). Names follow Tailwind CSS where Xefy has the
+Tint is how Xefy UI is styled: short utility classes in a string, over the theme's tokens
+(decisions 0017 and 0021). This is its vocabulary. Names follow Tailwind CSS where Xefy has the
 same concept, so what a web developer already knows works. Where Xefy differs, this file says so.
 
 ```prismio
-fn ProjectCard(ui: Ui, name: String, summary: String) {
-    Column(ui, "p-4 gap-2 bg-surface rounded-lg border hover:border-strong transition", |ui: Ui| {
-        Text(ui, name, "text-base font-medium")
-        Text(ui, summary, "text-sm text-muted line-clamp-2")
-        Row(ui, "gap-2 justify-end", |ui: Ui| {
-            if Button(ui, "Open", "bg-primary text-on-primary hover:bg-primary-hover") { }
+fn ProjectCard(scope: Scope, name: String, summary: String) {
+    Column(scope, "p-4 gap-2 bg-surface rounded-lg border hover:border-strong transition", |scope: Scope| {
+        Text(scope, name, "text-base font-medium")
+        Text(scope, summary, "text-sm text-muted line-clamp-2")
+        Row(scope, "gap-2 justify-end", |scope: Scope| {
+            if Button(scope, "Open", "bg-primary text-on-primary hover:bg-primary-hover") { }
         })
     })
 }
@@ -67,7 +68,7 @@ value    = token | number | fraction | "[" arbitrary "]"
 | `hover:` | The pointer is over the node |
 | `pressed:` | The pointer is down on it |
 | `focus:` | It has keyboard focus |
-| `disabled:` `selected:` `checked:` | The component reports that state |
+| `disabled:` `selected:` `checked:` | The composable reports that state |
 | `dark:` `light:` | The active theme mode |
 | `sm:` `md:` `lg:` `xl:` | The **window** is at least 640, 768, 1024, 1280 logical pixels wide |
 | `compact:` | The theme's density is compact |
@@ -80,7 +81,7 @@ duration instead of switching.
 ## What differs from Tailwind
 
 - **No margins.** Space comes from the parent's `gap` and padding, as in Compose.
-- **No `flex`, `flex-row`, `grid`, `block`, `hidden`.** The component decides the layout:
+- **No `flex`, `flex-row`, `grid`, `block`, `hidden`.** The composable decides the layout:
   `Row`, `Column`, `Box`, `Grid`. Classes style it.
 - **Breakpoints measure the window**, not a screen or a container.
 - **Colours are theme roles**, not a numbered palette. `bg-blue-500` does not exist;
@@ -98,19 +99,19 @@ let CARD = "p-4 bg-surface rounded-lg border"
 fn dangerButton() -> String { return "bg-danger text-on-primary hover:opacity-90" }
 ```
 
-Component defaults come from the theme; a component applies its defaults first and the
+Composable defaults come from the theme; a composable applies its defaults first and the
 caller's classes after, so the caller wins.
 
 ## With `Modifier`
 
-`cls("p-4 rounded-lg")` gives a `Modifier` to continue with computed values:
-`cls("p-4 rounded-lg").width(panelWidth)`. Every component that takes a class string has an
+`tint("p-4 rounded-lg")` gives a `Modifier` to continue with computed values:
+`tint("p-4 rounded-lg").width(panelWidth)`. Every composable that takes a class string has an
 overload taking a `Modifier` in the same position.
 
 ## Errors
 
 An unknown class, an unknown variant, a value outside its scale, or a class that does not
-apply to the component (`justify-between` on a `Text`) is reported with the class, the
-component and the source of the string when known. Debug builds report once per distinct
+apply to the composable (`justify-between` on a `Text`) is reported with the class, the
+composable and the source of the string when known. Debug builds report once per distinct
 string at run time; `xefy check` reports from source without running the app. Release builds
 ignore the class.

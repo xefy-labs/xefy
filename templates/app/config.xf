@@ -15,6 +15,11 @@ window {
     resizable = true
 }
 
+theme {
+    preset = "porcelain"
+    mode   = "system"
+}
+
 assets {
     dir("assets/images")
 }
@@ -34,5 +39,5 @@ permissions {
 targets {
     macos  { minOs = "13.0" }
     linux  { backend = "wayland" }
-    xefyos { format = "xapp" }
+    aos { format = "xapp" }
 }

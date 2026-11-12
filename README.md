@@ -1,8 +1,8 @@
 # Xefy
 
-Xefy is a cross-platform UI framework written in Prismio. Apps describe their UI in a
-Compose-style API; Xefy lays it out, paints it with Skia, and runs it on macOS, Windows, Linux
-and XefyOS (a desktop OS on the Linux kernel). It reuses Flutter's source where that saves work,
+Xefy is a cross-platform UI framework written in Prismio. Apps describe their UI with Xefy UI, a
+declarative API of composables in the style of Jetpack Compose, styled with Tint classes; Xefy lays it out, paints it with Skia, and runs it on macOS, Windows, Linux
+and AOS (a desktop OS on the Linux kernel). It reuses Flutter's source where that saves work,
 and depends on neither Flutter nor Dart.
 
 ## Status
@@ -44,8 +44,8 @@ python3 xefy.py setup
 | `engine/skia_c/` | Drawing and text functions of the ABI, implemented on Skia |
 | `engine/embedder/` | Window, input and platform code, one subdirectory per platform |
 | `engine/three/` | Optional bgfx scene rendering |
-| `framework/` | The Prismio packages (`xefy.kit`, `xefy.compose`, and others) |
-| `os/` | XefyOS: compositor, shell and `.xapp` packaging |
+| `framework/` | The Prismio packages (`xefy.ui`, `xefy.tint`, `xefy.runtime`, and others) |
+| `os/` | AOS: compositor, shell and `.xapp` packaging |
 | `templates/app/` | The app template that `xefy create` copies |
 | `third_party/` | Fetched by setup and gitignored: Skia, Flutter (reference), bgfx, bx, bimg |
 | `vendor/flutter/` | Copied Flutter C++, checked in with `PROVENANCE.json` |
