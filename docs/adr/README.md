@@ -1,0 +1,22 @@
+# Decision records
+
+One decision per file. A record is changed only by a later record that names it.
+
+- [0001. Repository layout and the two tools](0001-repository-layout.md)
+- [0002. Languages: Prismio above the boundary, C++ below it, Python for scripts](0002-languages.md)
+- [0003. One C ABI between framework and engine](0003-one-c-abi.md)
+- [0004. ABI v0 is pull-style: Prismio owns the loop](0004-pull-style-event-loop.md)
+- [0005. Skia for 2D, bgfx for 3D only](0005-skia-2d-bgfx-3d.md)
+- [0006. A Compose-style API over a Flutter-derived layout and paint model](0006-compose-api-flutter-render-tree.md)
+- [0007. Reusing Flutter: port Dart, copy C++, record provenance](0007-flutter-reuse.md)
+- [0008. The v0 UI runtime: explicit `Ui` context, immediate-mode events](0008-v0-ui-runtime.md)
+- [0009. Nodes live in an arena and are addressed by index](0009-node-storage.md)
+- [0010. Units, coordinates and colour](0010-units-coordinates-colour.md)
+- [0011. Text: Skia's paragraph module, UTF-8 byte offsets](0011-text.md)
+- [0012. `config.xf` is an app's source of truth](0012-config-xf.md)
+- [0013. How an app sees the framework](0013-framework-distribution.md)
+- [0014. One thread in v0](0014-threading.md)
+- [0015. XefyOS app model](0015-xefyos-app-model.md)
+- [0016. One Xefy design language, desktop first, with its own font and icons](0016-design-language.md)
+- [0017. Utility class strings as the primary way to style](0017-style-classes.md)
+- [0018. The visual direction is Porcelain](0018-porcelain.md)

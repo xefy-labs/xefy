@@ -1,0 +1,13 @@
+# GN args for Skia on macOS arm64 (Metal). Must stay semantically identical to the
+# args of the existing build in third_party/skia/out/macos-arm64 (setup adopts it by
+# comparing parsed key=value pairs). Changing any value here triggers a rebuild.
+is_official_build = true
+target_cpu = "arm64"
+skia_use_metal = true
+skia_use_system_libpng = false
+skia_use_system_libjpeg_turbo = false
+skia_use_system_libwebp = false
+skia_use_system_zlib = false
+skia_use_system_harfbuzz = false
+skia_use_system_expat = false
+skia_use_system_icu = false

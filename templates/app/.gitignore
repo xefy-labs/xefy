@@ -1,0 +1,7 @@
+.xefy/
+
+# Output of `prismio run src/main.psm`
+/src/main
+
+# The framework source, linked in by the xefy tool
+/src/xefy

@@ -1,0 +1,5 @@
+// English strings. Add one file per locale next to this one.
+
+strings {
+    greeting = "Hello from {{name}}"
+}

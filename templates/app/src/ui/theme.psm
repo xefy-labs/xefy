@@ -1,0 +1,5 @@
+// Colours as 0xRRGGBB integers.
+public const BACKGROUND = 0x14161C
+public const SURFACE = 0x1E212B
+public const ACCENT = 0x7D73FF
+public const TEXT = 0xF2F3F7

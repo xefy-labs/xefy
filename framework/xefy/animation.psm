@@ -1,0 +1,62 @@
+// Cubic Bezier easing solver ported from Flutter's
+// packages/flutter/lib/src/animation/curves.dart (Cubic._evaluateCubic and
+// Cubic.transformInternal), Flutter revision c197ca5199.
+// Copyright 2014 The Flutter Authors. Licensed under the BSD 3-Clause License;
+// see licenses/FLUTTER-LICENSE.txt. This PSM implementation is Xefy-owned and
+// has no Flutter or Dart runtime dependency.
+
+import std.math
+
+let CUBIC_ERROR_BOUND: Float = 0.001
+
+private fn evaluateCoordinate(first: Float, second: Float, t: Float) -> Float {
+    let inverse = 1.0 - t
+    return 3.0 * first * inverse * inverse * t +
+           3.0 * second * inverse * t * t +
+           t * t * t
+}
+
+// Evaluate a cubic Bezier easing curve. The endpoints are (0, 0) and (1, 1);
+// x1/y1 and x2/y2 are its control points. The parameter is clamped to [0, 1].
+// The binary search is bounded to 32 steps so malformed control points cannot
+// leave an application stuck in an unbounded loop.
+public fn cubicBezier(
+    progress: Float,
+    x1: Float,
+    y1: Float,
+    x2: Float,
+    y2: Float
+) -> Float {
+    if progress.isNan { return Float.NAN }
+    if progress <= 0.0 { return 0.0 }
+    if progress >= 1.0 { return 1.0 }
+
+    let mut start = 0.0
+    let mut end = 1.0
+    let mut midpoint = 0.5
+    let mut iteration = 0
+    while iteration < 32 {
+        midpoint = (start + end) / 2.0
+        let estimate = evaluateCoordinate(x1, x2, midpoint)
+        if (progress - estimate).abs() < CUBIC_ERROR_BOUND {
+            return evaluateCoordinate(y1, y2, midpoint)
+        }
+        if estimate < progress {
+            start = midpoint
+        } else {
+            end = midpoint
+        }
+        iteration = iteration + 1
+    }
+    return evaluateCoordinate(y1, y2, midpoint)
+}
+
+// Flutter Curves.easeInOutCubic control points.
+public fn easeInOutCubic(progress: Float) -> Float {
+    return cubicBezier(progress, 0.645, 0.045, 0.355, 1.0)
+}
+
+// Flutter Curves.fastOutSlowIn control points.
+public fn fastOutSlowIn(progress: Float) -> Float {
+    return cubicBezier(progress, 0.4, 0.0, 0.2, 1.0)
+}

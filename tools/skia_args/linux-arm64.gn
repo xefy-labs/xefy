@@ -1,0 +1,16 @@
+# GN args for Skia on linux-arm64 (Vulkan + GL).
+# UNTESTED: this file has never been used to build Skia on Linux. Expect to adjust it
+# (e.g. skia_use_system_* values, fontmgr choice) when first running it on a Linux machine.
+is_official_build = true
+target_cpu = "arm64"
+skia_use_vulkan = true
+skia_use_gl = true
+skia_use_system_libpng = false
+skia_use_system_libjpeg_turbo = false
+skia_use_system_libwebp = false
+skia_use_system_zlib = false
+skia_use_system_harfbuzz = false
+skia_use_system_expat = false
+skia_use_system_icu = false
+skia_use_system_freetype2 = false
+skia_use_fontconfig = false

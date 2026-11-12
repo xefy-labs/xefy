@@ -1,0 +1,7 @@
+// Entry point. Once the Xefy UI framework ships, this body is replaced by the
+// UI entry point, `runApp`, and app.psm supplies the root view.
+import app
+
+fn main() -> Int {
+    return startApp()
+}

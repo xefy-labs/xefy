@@ -1,0 +1,53 @@
+import std.fs
+import std.option
+import std.string
+import std.vec
+
+public struct Substitutions {
+    public name: String,
+    public id: String
+}
+
+public fn pathExists(path: String) -> Bool {
+    let info = metadata(path)
+    return info != none
+}
+
+// Copies the tree at `source` into `destination`, which must not exist yet,
+// and appends the path of every file written to `created`. Returns false at
+// the first entry that cannot be read or written; what was written before
+// that is left in place.
+public fn copyTree(source: String, destination: String, values: Substitutions, inout created: Vec<String>) -> Bool {
+    if (not makeDirectory(destination)) {
+        return false
+    }
+    for entry in listDirectory(source) {
+        let from = joinPath(source, entry)
+        let info = metadata(from)
+        if (info == none) {
+            return false
+        }
+        let kind = expect(info)
+        if (kind.isDirectory) {
+            if (not copyTree(from, joinPath(destination, entry), values, created)) {
+                return false
+            }
+        } else if (kind.isFile) {
+            let to = joinPath(destination, entry)
+            if (not copyFile(from, to, values)) {
+                return false
+            }
+            created.push(to)
+        }
+    }
+    return true
+}
+
+fn copyFile(source: String, destination: String, values: Substitutions) -> Bool {
+    let text = readFile(source)
+    return writeFile(destination, substitute(text, values))
+}
+
+fn substitute(text: String, values: Substitutions) -> String {
+    return text.replace("{{name}}", values.name).replace("{{id}}", values.id)
+}

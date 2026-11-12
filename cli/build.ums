@@ -1,0 +1,11 @@
+project {
+    name = "xefy"
+    version = "0.1.0"
+    prismio = "0.2.0"
+}
+
+targets {
+    executable("xefy") {
+        entry = "src/main.psm"
+    }
+}

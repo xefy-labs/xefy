@@ -1,0 +1,35 @@
+import std.io
+import std.process
+import std.string
+import create
+import usage
+
+const EXIT_USAGE = 2
+
+fn main() -> Int {
+    if (process.args.count < 2) {
+        printUsage()
+        return 0
+    }
+
+    let command = process.args[1]
+    if (command == "version" or command == "--version") {
+        printVersion()
+        return 0
+    }
+    if (command == "help" or command == "--help") {
+        printUsage()
+        return 0
+    }
+    if (command == "create") {
+        return runCreate(2)
+    }
+    if (command == "build" or command == "run" or command == "bundle" or command == "doctor") {
+        eprintln("xefy " + command + ": not implemented yet")
+        return EXIT_USAGE
+    }
+
+    eprintln("xefy: unknown command '" + command + "'")
+    eprintUsage()
+    return EXIT_USAGE
+}

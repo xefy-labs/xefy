@@ -1,0 +1,32 @@
+import build
+import std.io
+import std.string
+
+public fn printVersion() {
+    println("xefy " + BUILD_VERSION)
+}
+
+public fn printUsage() {
+    println(usageText())
+}
+
+public fn eprintUsage() {
+    eprintln(usageText())
+}
+
+fn usageText() -> String {
+    return """Usage: xefy <command> [options]
+
+Commands:
+  create <name>   Create a new app in ./<name> from the app template
+  build           Build the app for the current platform
+  run             Build and run the app
+  bundle          Package the app for distribution
+  doctor          Check the development environment
+  version         Print the xefy version
+  help            Print this text
+
+Options for create:
+  --id <bundle-id>    Bundle identifier (default: com.example.<name>)
+  --template <dir>    Template directory (default: $XEFY_HOME/templates/app)"""
+}

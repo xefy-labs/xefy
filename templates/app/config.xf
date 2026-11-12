@@ -1,0 +1,38 @@
+// Xefy app configuration. Reference: docs/config-xf.md in the Xefy repository.
+
+app {
+    name    = "{{name}}"
+    id      = "{{id}}"
+    version = "0.1.0"
+    xefy    = "0.1"
+    entry   = "src/main.psm"
+}
+
+window {
+    title     = "{{name}}"
+    width     = 960
+    height    = 640
+    resizable = true
+}
+
+assets {
+    dir("assets/images")
+}
+
+dependencies {
+}
+
+features {
+    three = false
+}
+
+permissions {
+    network = false
+    files   = "none"
+}
+
+targets {
+    macos  { minOs = "13.0" }
+    linux  { backend = "wayland" }
+    xefyos { format = "xapp" }
+}

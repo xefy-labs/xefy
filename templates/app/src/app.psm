@@ -1,0 +1,9 @@
+import std.io
+import std.string
+import ui.theme
+
+public fn startApp() -> Int {
+    println("{{name}}: Xefy UI runtime is not available yet")
+    println("accent colour: 0x" + ACCENT.toString(16))
+    return 0
+}

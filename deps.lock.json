@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "dependencies": [
+    {
+      "name": "skia",
+      "url": "https://skia.googlesource.com/skia.git",
+      "revision": "d3e4f374722e2acb90c472c9cf4af976daf777a9",
+      "dest": "third_party/skia",
+      "role": "required",
+      "builder": "skia"
+    },
+    {
+      "name": "flutter",
+      "url": "https://github.com/flutter/flutter.git",
+      "revision": "c197ca5199e9ee5661e865596c9c07294dfab51c",
+      "dest": "third_party/flutter",
+      "role": "reference",
+      "note": "Source to port from. Never built or linked. Copied code must be recorded in vendor/flutter/PROVENANCE.json."
+    },
+    {
+      "name": "bgfx",
+      "url": "https://github.com/bkaradzic/bgfx.git",
+      "revision": "eebf5686a8c5f1c77e1af2dad17b5746ba17da8f",
+      "dest": "third_party/bgfx",
+      "role": "optional",
+      "feature": "three",
+      "builder": "bgfx",
+      "note": "Pinned to default-branch HEAD (git ls-remote) on 2026-11-12."
+    },
+    {
+      "name": "bx",
+      "url": "https://github.com/bkaradzic/bx.git",
+      "revision": "57548da89a07771c5b0f8a6711149be70e08a329",
+      "dest": "third_party/bx",
+      "role": "optional",
+      "feature": "three",
+      "builder": "bgfx",
+      "note": "Pinned to default-branch HEAD (git ls-remote) on 2026-11-12."
+    },
+    {
+      "name": "bimg",
+      "url": "https://github.com/bkaradzic/bimg.git",
+      "revision": "22177183239e18d7af603e6915156371cc38d18d",
+      "dest": "third_party/bimg",
+      "role": "optional",
+      "feature": "three",
+      "builder": "bgfx",
+      "note": "Pinned to default-branch HEAD (git ls-remote) on 2026-11-12."
+    }
+  ]
+}

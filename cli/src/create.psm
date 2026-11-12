@@ -1,0 +1,145 @@
+import std.fs
+import std.io
+import std.option
+import std.process
+import std.string
+import std.vec
+import template
+
+const EXIT_FAILURE = 1
+const EXIT_USAGE = 2
+
+// Positions in process.args of what the command line named; 0 means absent.
+// Holding positions rather than strings keeps every String here either a
+// view of argv or a fresh local result, never a conditionally assigned
+// variable.
+struct ArgPositions {
+    name: Int,
+    id: Int,
+    templateDir: Int
+}
+
+// Handles `xefy create`; `first` is the index in process.args of the
+// argument after the command name.
+public fn runCreate(first: Int) -> Int {
+    let mut found = ArgPositions { name: 0, id: 0, templateDir: 0 }
+    let problem = scanArgs(first, found)
+    if (problem.isNotEmpty) {
+        eprintln("xefy create: " + problem)
+        eprintln("usage: xefy create <name> [--id <bundle-id>] [--template <dir>]")
+        return EXIT_USAGE
+    }
+
+    let name = process.args[found.name]
+    let nameProblem = checkName(name)
+    if (nameProblem.isNotEmpty) {
+        eprintln("xefy create: " + nameProblem)
+        return EXIT_USAGE
+    }
+
+    let templateDir = templatePath(found.templateDir)
+    if (templateDir.isEmpty) {
+        eprintln("xefy create: no template: pass --template <dir> or set XEFY_HOME")
+        return EXIT_USAGE
+    }
+
+    if (pathExists(name)) {
+        eprintln("xefy create: './" + name + "' already exists")
+        return EXIT_FAILURE
+    }
+    if (not directoryExists(templateDir)) {
+        eprintln("xefy create: template directory '" + templateDir + "' does not exist")
+        return EXIT_FAILURE
+    }
+
+    let values = Substitutions { name: name.clone(), id: bundleId(found.id, name) }
+    let mut created: Vec<String> = []
+    if (not copyTree(templateDir, name, values, created)) {
+        eprintln("xefy create: could not copy the template into './" + name + "'")
+        return EXIT_FAILURE
+    }
+
+    printCreated(name, created)
+    return 0
+}
+
+// Empty when the arguments are well formed; otherwise says what is wrong.
+fn scanArgs(first: Int, inout found: ArgPositions) -> String {
+    let count = process.args.count
+    let mut i = first
+    while (i < count) {
+        let arg = process.args[i]
+        if (arg == "--id" or arg == "--template") {
+            if (i + 1 >= count) {
+                return arg + " needs a value"
+            }
+            if (arg == "--id") {
+                found.id = i + 1
+            } else {
+                found.templateDir = i + 1
+            }
+            i = i + 2
+        } else if (arg.startsWith("-")) {
+            return "unknown option '" + arg + "'"
+        } else if (found.name != 0) {
+            return "unexpected argument '" + arg + "'"
+        } else {
+            found.name = i
+            i = i + 1
+        }
+    }
+    if (found.name == 0) {
+        return "missing app name"
+    }
+    return ""
+}
+
+fn bundleId(position: Int, name: String) -> String {
+    if (position != 0) {
+        return process.args[position].clone()
+    }
+    return "com.example." + name
+}
+
+// The explicit --template, else $XEFY_HOME/templates/app, else empty.
+fn templatePath(position: Int) -> String {
+    if (position != 0) {
+        return process.args[position].clone()
+    }
+    let home = process.env("XEFY_HOME") ?? ""
+    if (home.isEmpty) {
+        return ""
+    }
+    return joinPath(joinPath(home, "templates"), "app")
+}
+
+// Empty when `name` is acceptable; otherwise says why it is not.
+fn checkName(name: String) -> String {
+    if (name.isEmpty) {
+        return "the app name is empty"
+    }
+    if (not isLowerLetter(name[0])) {
+        return "invalid app name '" + name + "': it must start with a lowercase letter"
+    }
+    for c in name {
+        if (not (isLowerLetter(c) or c.isDigit or c == '_')) {
+            return "invalid app name '" + name + "': use only lowercase letters, digits and '_'"
+        }
+    }
+    return ""
+}
+
+fn isLowerLetter(c: Char) -> Bool {
+    return c >= 'a' and c <= 'z'
+}
+
+fn printCreated(name: String, created: Vec<String>) {
+    println("Created ./" + name + " with " + created.length.toString() + " files:")
+    for path in created {
+        println("  " + path)
+    }
+    println("")
+    println("Next steps:")
+    println("  cd " + name)
+    println("  xefy run")
+}

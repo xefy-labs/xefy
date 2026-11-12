@@ -1,0 +1,17 @@
+# Fetched by `python3 xefy.py setup`
+/third_party/
+
+# Build output
+.xefy/
+.prismio/
+/build/
+__pycache__/
+*.pyc
+
+# Website
+node_modules/
+.next/
+
+# Editors and OS
+.idea/
+.DS_Store
